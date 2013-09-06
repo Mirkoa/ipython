@@ -16,8 +16,7 @@ from within Jinja templates.
 
 from  pygments import highlight as pygements_highlight
 from pygments.lexers import get_lexer_by_name
-from pygments.formatters import HtmlFormatter
-from pygments.formatters import LatexFormatter
+from pygments.formatters import HtmlFormatter, LatexFormatter, RtfFormatter
 
 # Our own imports
 from IPython.nbconvert.utils.lexers import IPythonLexer
@@ -34,7 +33,8 @@ MULTILINE_OUTPUTS = ['text', 'html', 'svg', 'latex', 'javascript', 'json']
 
 __all__ = [
     'highlight2html',
-    'highlight2latex'
+    'highlight2latex',
+    'highlight2rtf'
 ]
 
 
@@ -65,6 +65,20 @@ def highlight2latex(source, language='ipython'):
         Language to highlight the syntax of.
     """
     return _pygment_highlight(source, LatexFormatter(), language)
+
+
+def highlight2rtf(source, language='ipython'):
+    """
+    Return a syntax-highlighted version of the input source as RTF output.
+    
+    Parameters
+    ----------
+    source : str
+        Source code to highlight the syntax of.
+    language : str
+        Language to highlight the syntax of.
+    """
+    return _pygment_highlight(source, RtfFormatter(), language)
 
 
 def _pygment_highlight(source, output_formatter, language='ipython'):

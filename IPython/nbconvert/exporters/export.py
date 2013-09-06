@@ -25,6 +25,7 @@ from .latex import LatexExporter
 from .markdown import MarkdownExporter
 from .python import PythonExporter
 from .rst import RSTExporter
+from .rtf import RTFExporter
 
 #-----------------------------------------------------------------------------
 # Classes
@@ -76,6 +77,7 @@ __all__ = [
     'export_markdown',
     'export_python',
     'export_rst',
+    'export_rtf',
     'export_by_name',
     'get_export_names',
     'ExporterNameError'
@@ -129,6 +131,7 @@ exporter_map = dict(
     markdown=MarkdownExporter,
     python=PythonExporter,
     rst=RSTExporter,
+    rtf=RTFExporter,
 )
 
 def _make_exporter(name, E):
