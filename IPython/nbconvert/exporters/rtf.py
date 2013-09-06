@@ -27,5 +27,5 @@ class RTFExporter(Exporter):
     """
     
     file_extension = Unicode(
-        'rft', config=True, 
+        'rtf', config=True, 
         help="Extension of the file that should be written to disk")

@@ -38,6 +38,7 @@ __all__ = [
     'get_lines',
     'ipython2python',
     'posix_path',
+    'escape_rtf'
 ]
 
 
@@ -160,6 +161,7 @@ def get_lines(text, start=None,end=None):
     # Return the right lines.
     return "\n".join(lines[start:end]) #re-join
 
+
 def ipython2python(code):
     """Transform IPython syntax to pure Python syntax
 
@@ -172,6 +174,7 @@ def ipython2python(code):
     shell = InteractiveShell.instance()
     return shell.input_transformer_manager.transform_cell(code)
 
+
 def posix_path(path):
     """Turn a path into posix-style path/to/etc
     
@@ -181,3 +184,9 @@ def posix_path(path):
     if os.path.sep != '/':
         return path.replace(os.path.sep, '/')
     return path
+
+
+def escape_rtf(text):
+    """Escape RTF characters in a string of text
+    """
+    return text.replace('\\', '\\\\').replace('{', '\\{').replace('}', '\\}')
