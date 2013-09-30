@@ -185,7 +185,7 @@ This template does not define a docclass, the inheriting class must define this.
 
 % Render markdown
 ((* block markdowncell scoped *))
-    ((( cell.source | citation2latex | markdown2latex )))
+    ((( cell.source  | citation2latex | markdown2latex )))
 ((* endblock markdowncell *))
 
 % Spit out the contents of raw cells unmodified
