@@ -39,7 +39,7 @@
 {% block input_group scoped %}
     {{ super() }}
 
-    {% if "snapshot" in cell.metadata %}
+    {% if "widget_cache" in cell.metadata %}
         <div id="widget-group-{{cell.prompt_number}}">
             <div class="widget-area">
                 <div class="prompt">
@@ -50,6 +50,7 @@
         </div>
 
         <script type="text/javascript">
+
             var cell = {
                 widget_area: $("#widget-group-{{cell.prompt_number}} .widget-area"),
                 widget_subarea: $("#widget-group-{{cell.prompt_number}} .widget-area .widget-subarea"),
@@ -71,20 +72,9 @@
                 }
             };
 
-            var cell_frames = {{cell.metadata.snapshot.frames}};
-            {% if 'controllers' in cell.metadata.snapshot: %}
-                var cell_controllers = {{cell.metadata.snapshot.controllers}};
-            {% else %}
-                var cell_controllers = [];
-            {% endif %}
-            var cell_display = {{cell.metadata.snapshot.display}};
-            widget_manager.register_controllers(cell_controllers, cell_frames);
-
-            for (var i = 0; i < cell_display.length; i++) {
-                var model_id = cell_display[i][0];
-                var initial_state = cell_frames[0].states[model_id];
-                widget_manager.display_widget(model_id, cell_display[i][1], cell_display[i][2], cell, initial_state, cell_display[i][3]);
-            }
+            var cell_cache = {{cell.metadata.widget_cache}};
+            widget_manager.handle_msgs(cell, cell_cache.initial);
+            widget_manager.register_frames(cell, cell_cache.frames);
         </script>
     {% endif %}
 {% endblock input_group %}

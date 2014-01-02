@@ -195,7 +195,7 @@ class StaticWidgetManager(object):
         widget.original_send = widget._send
         def handle_send(msg):
             widget.original_send(msg)
-            self.sent_msgs.append((hex(id(widget)), msg)
+            self.sent_msgs.append((hex(id(widget)), widget.target_name, msg)
         widget._send = handle_send
 
     def _unhook_send(self, widget):

@@ -91,7 +91,7 @@ function(widget_manager, underscore, backbone){
                     break;
                 case 'set_widget_cache':
                     var cell = this._get_msg_cell(msg.parent_header.msg_id);
-                    cell.metadata.cache = msg.content.data.cache;
+                    cell.metadata.widget_cache = msg.content.data.widget_cache;
                     break;
                 case 'custom':
                     this.trigger('msg', msg.content.data.custom_content);

@@ -6,7 +6,7 @@ var widget_manager = {
     widget_view_types: {},
     _handling_sync: false,
     _model_instances: {},
-    _controller_sets: {},
+    _current_cell: null,
 
     register_widget_model: function (widget_model_name, widget_model_type) {
         this.widget_model_types[widget_model_name] = widget_model_type;
@@ -28,7 +28,7 @@ var widget_manager = {
 
 
     get_msg_cell: function (msg_id) {
-        return null;
+        return this._current_cell;
     },
 
 
@@ -52,82 +52,45 @@ var widget_manager = {
         }
     },
 
-    // Display a widget.
-    display_widget: function (widget_id, target_model, view_name, cell, initial_state, parent_id) {
-        
-        // Create the widget model.
-        var model = this.get_model(widget_id);
-        if (model === null && this.widget_model_types[target_model] !== undefined) {
-            model = new this.widget_model_types[target_model](this, widget_id);
-            this._model_instances[widget_id] = model;
-            this._handle_create_widget(model);
-        }
+    handle_msgs: function(cell, msgs) {
+        this._current_cell = cell;
 
-        if (model === null) {
-            console.log('Model with target type "' + target_model + '"" could not be created.');
-        } else {
-            model.apply_update(initial_state);
-            model.display_view(view_name, parent_id, cell);
-        }
-    },
-
-    // Register a list of controllers and the state sets associated with
-    // their values.
-    register_controllers: function(controllers, frames) {
-        var controller_set ={controllers: controllers, frames: frames};
-        for (var i = 0; i < controllers.length; i++) {
-            var controller = controllers[i];
-            if (this._controller_sets[controller] === undefined) {
-                this._controller_sets[controller] = [];
+        for (var i = 0; i < msgs.length; i++) {
+            var model = this.get_model(msgs[i][0])
+            if (model === null) {
+                model = new this.widget_model_types[msgs[i][1]](this, msgs[i][0]);
+                this._model_instances[msgs[i][0]] = model;
+                this._handle_create_widget(model);
             }
-            this._controller_sets[controller].push(controller_set);
+
+            var msg = {
+                parent_header: {msg_id: 0},
+                content: {data: msgs[i][2]}
+            };
+            model._handle_comm_msg(msg);
         }
     },
+
+    register_frames: function(cell, frames) {
+
+    },
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+
+            // for (var i = 0; i < cell_cache.initial.length; i++) {
+            //     var model_id = cell_cache.initial[i][0];
+            //     var msg = cell_cache.initial[i][1];
+
+            //     widget_manager.display_widget(model_id, cell_display[i][1], cell_display[i][2], cell, initial_state, cell_display[i][3]);
+            // }
+
 
     _handle_sync: function(model) {
         if (!this._handling_sync) {
             this._handling_sync = true;
-            if (this._controller_sets[model.id] !== undefined && this._controller_sets[model.id].length > 0) {
-                for (var i = 0; i < this._controller_sets[model.id].length; i++) {
-                    var controller_set = this._controller_sets[model.id][i];
-                    var current_state_index = -1;
-                    for (var j=0; j < controller_set.frames.length; j++) {
-                        var values_match = true;
-                        for (var k=0; k < controller_set.controllers.length; k++) {
-                            var controller_id = controller_set.controllers[k];
-                            var controller_model = this.get_model(controller_id);
-                            if (controller_model !== null) {
-                                var controller_value = controller_model.get('value');
-                                if (controller_value != controller_set.frames[j].states[controller_id].value) {
-                                    values_match = false;
-                                    break;
-                                }    
-                            }
-                        }
+            
+            // TODO
 
-                        if (values_match) {
-                            current_state_index = j;
-                            break;
-                        }
-                    }
-
-                    if (current_state_index>=0) {
-                        // APPLY STATES TO ALL WIDGETS
-                        for (var key in controller_set.frames[current_state_index].states) {
-                            var state = controller_set.frames[current_state_index].states[key];
-                            var key_model = this.get_model(key);
-                            if (key_model !== null) {
-                                key_model.apply_update(state);
-                            }
-                        }
-
-                        // Apply stdout if possible.
-                        if (model.last_modified_view !== undefined && model.last_modified_view !== null) {
-                            model.last_modified_view.cell.set_stdout(controller_set.frames[current_state_index].stdout);
-                        }
-                    }
-                }
-            }    
             this._handling_sync = false;
         }
     },
